@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+</head>
+<body>
+    <center>
+    <div id="loginSection">
+        <form id="loginForm">
+            <br>
+            <h1>Iniciar sesión</h1>
+
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email">
+            <p><label for="password">Password:</label>
+            <input type="password" id="password" name="password"></p>
+            <p><button type="button" onclick="login()">Iniciar sesión</button></p>
+            <p><a href="/">Regresar</a></p>
+        </form>
+    </div>
+
+    <div id="logoutSection" style="display:none;">
+        <br>
+        <h1>Cerrar sesión</h1>
+        <button type="button" onclick="logout()">Cerrar Sesión</button>
+
+    </div>
+    </center>
+
+    <script>
+        function changeText() {
+
+
+            const sesionExistente = sessionStorage.getItem('token');
+            const loginSection = document.getElementById('loginSection');
+            const logoutSection = document.getElementById('logoutSection');
+
+            if (sesionExistente) {
+                // Si hay una sesión iniciada, mostrar la sección de cerrar sesión y ocultar la de inicio de sesión
+                loginSection.style.display = 'none';
+                logoutSection.style.display = 'block';
+            } else {
+                // Si no hay una sesión iniciada, mostrar la sección de inicio de sesión y ocultar la de cerrar sesión
+                loginSection.style.display = 'block';
+                logoutSection.style.display = 'none';
+            }
+        }
+
+        // Llama a changeText() cuando se carga la página para determinar qué sección mostrar
+        window.onload = changeText;
+
+        async function login() {
+            const sesionExistente = sessionStorage.getItem('token');
+
+            if (sesionExistente){
+                alert('Ya iniciaste sesión');
+                return;
+            }
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            const response = await fetch('http://127.0.0.1:8000/token/', {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Basic ' + btoa(`${email}:${password}`)
+                }
+            });
+
+
+            if (response.ok) {
+
+                const data = await response.json();
+                sessionStorage.setItem('token', data.token);
+                window.location.href = '/';
+            } else {
+                // Manejar el caso en el que la autenticación falla
+                console.error('Error en la autenticación');
+            }
+        }
+
+        function logout() {
+            // Eliminar el token almacenado en sessionStorage
+            sessionStorage.removeItem('token');
+            alert('Sesión cerrada');
+            window.location.href = "/sesion";
+        }
+        document.addEventListener('DOMContentLoaded', changeText);
+    </script>
+</body>
+</html>

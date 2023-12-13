@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contactos</title>
+    <script defer src="../static/js/delete.js"></script>
+</head>
+
+<body>
+    <div align="center">
+        <h1>Contacto</h1>
+        <div id="statusMessage"></div>
+        <button type="button" onclick="deleteContact()">Borrar</button>
+        <a href="/">Cancelar</a>
+    </div>
+    <script>
+        async function deleteContact() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const email = urlParams.get('email');
+
+            try {
+                const statusResponse = await checkServerStatus();
+
+                if (statusResponse.status === 200) {
+                    await deleteData(email);
+                } else if (statusResponse.status === 401) {
+                    window.location.href = "/sesion";
+                    alert("Token inválido");
+                } else {
+                    alert("Ocurrió un error");
+                }
+            } catch (error) {
+                handleServerError(error);
+            }
+        }
+
+        async function checkServerStatus() {
+            const response = await fetch('http://127.0.0.1:8000/', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                }
+            });
+
+            if (response.ok) {
+                return response;
+            } else {
+                throw await response.json();
+            }
+        }
+
+
+
+        function handleServerError(error) {
+            console.error('Error en la solicitud:', error.message || error.statusText);
+            document.getElementById('statusMessage').innerText = 'Error al procesar la solicitud';
+        }
+
+        document.addEventListener('DOMContentLoaded', checkServerStatus);
+    </script>
+</body>
+
+</html>

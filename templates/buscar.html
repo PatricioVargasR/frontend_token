@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contactos</title>
+    <script defer src="../static/js/get_one.js"></script>
+</head>
+
+<body>
+    <div align="center">
+        <h1><b>Buscar Contacto</b></h1>
+        <form id="search-form">
+            <label for="email">Email:</label>
+            <input type="text" id="email" name="email">
+            <button type="button" onclick="searchContact()">Buscar</button>
+        </form>
+
+        <br>
+        <table border="1" id="table_contactos">
+            <thead id="thead_contactos">
+                <th>Email</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+            </thead>
+            <tbody id="tbody_contactos">
+                <tr>
+                    <td colspan="3">Escribe un correo electrónico y haz clic en "Buscar" para encontrar un contacto.</td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <a href="/">Regresar</a>
+    </div>
+
+    <script>
+        async function searchContact() {
+            const emailInput = document.getElementById("email");
+            const email = emailInput.value.trim(); // Trim to remove leading/trailing spaces
+            if (email === "") {
+                alert("Por favor, ingrese un correo electrónico válido.");
+                return;
+            }
+
+            await getForEmail(email);
+            // Limpiar el campo de entrada después de obtener el valor
+            emailInput.value = "";
+        }
+
+        async function checkServerStatus() {
+            try {
+                const response = await fetch('http://127.0.0.1:8000/', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${sessionStorage.getItem('token')}`
+                    }
+                });
+
+                if (response.status === 401) {
+                    window.location.href = "/sesion";
+                }
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('statusMessage').innerText = `Server response: ${data.message}`;
+                } else {
+                    const errorData = await response.json();
+                    console.error('Error checking server status:', errorData);
+                    document.getElementById('statusMessage').innerText = `Error: ${errorData.message}`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('statusMessage').innerText = 'Error checking server status';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', checkServerStatus);
+    </script>
+</body>
+
+</html>

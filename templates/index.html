@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contactos</title>
+    <script defer src="../static/js/get_all.js"></script>
+</head>
+
+<body>
+    <div align="center">
+        <div id="menu">
+            <h1>Contactos</h1>
+            <a href="/buscar">Buscar</a>
+            <a href="/insertar">Insertar</a>
+            <p><a href="/sesion" id="sesionLink">Iniciar sesión</a></p>
+        </div>
+
+        <br>
+        <table border="1" id="table_contactos">
+            <thead id="thead_contactos">
+                <th>Email</th>
+                <th>Nombre</th>
+                <th>Teléfono</th>
+                <th>Opciones</th>
+            </thead>
+            <tbody id="tbody_contactos">
+            </tbody>
+        </table>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            getAll();
+
+            const sesion = sessionStorage.getItem("token");
+            const sesionLink = document.getElementById('sesionLink');
+
+            if (sesion) {
+                sesionLink.href = "/sesion";
+                sesionLink.textContent = "Cerrar sesión";
+            }
+        });
+    </script>
+</body>
+
+</html>
